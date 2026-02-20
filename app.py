@@ -842,3 +842,57 @@ I can help you with:<br><br>
 
 if __name__ == "__main__":
     app.run(debug=False)
+
+# ─── MISSING ROUTES for mobile frontend ───────────────────────────────────────
+
+@app.route("/market_indices")
+def market_indices():
+    """Alias for /market – returns formatted list of index dicts."""
+    from market_data import get_market_indices
+    raw = get_market_indices()
+    return jsonify(raw)
+
+@app.route("/nifty_gainers")
+def nifty_gainers():
+    from market_data import get_nifty_gainers
+    return jsonify(get_nifty_gainers())
+
+@app.route("/nifty_losers")
+def nifty_losers():
+    from market_data import get_nifty_losers
+    return jsonify(get_nifty_losers())
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    """Alias for /get – the mobile frontend posts to /chat."""
+    user_input = request.form.get("msg", "")
+    return process_user_input(user_input)
+
+@app.route("/currency_convert")
+def currency_convert():
+    """
+    Convert between two currencies.
+    Query params: from, to, amount
+    """
+    try:
+        from_currency = request.args.get("from", "USD").upper()
+        to_currency   = request.args.get("to", "INR").upper()
+        amount        = float(request.args.get("amount", 1))
+
+        url = f"https://api.frankfurter.app/latest?from={from_currency}&to={to_currency}"
+        r   = requests.get(url, timeout=8)
+        r.raise_for_status()
+        data = r.json()
+        rate = data["rates"].get(to_currency)
+        if rate is None:
+            return jsonify({"error": "Rate not found"}), 404
+        return jsonify({
+            "from":      from_currency,
+            "to":        to_currency,
+            "amount":    amount,
+            "rate":      rate,
+            "converted": round(amount * rate, 4),
+            "date":      data.get("date", ""),
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

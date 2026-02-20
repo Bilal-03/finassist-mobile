@@ -7,18 +7,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#2563eb">
     <title>FinAssist Mobile</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style_mobile.css') }}">
-    
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -78,32 +78,46 @@
                 <span>Gold & Silver</span>
             </button>
         </div>
+        <div class="drawer-section">
+            <div class="drawer-section-title">Tools</div>
+            <button class="menu-item" onclick="showSection('emi'); closeMenu();">
+                <i class="fas fa-building"></i>
+                <span>EMI Calculator</span>
+            </button>
+            <button class="menu-item" onclick="showSection('sip'); closeMenu();">
+                <i class="fas fa-coins"></i>
+                <span>SIP Calculator</span>
+            </button>
+            <button class="menu-item" onclick="showSection('fd'); closeMenu();">
+                <i class="fas fa-piggy-bank"></i>
+                <span>FD Calculator</span>
+            </button>
+            <button class="menu-item" onclick="showSection('zakat'); closeMenu();">
+                <i class="fas fa-star-and-crescent"></i>
+                <span>Zakat Calculator</span>
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Main Container -->
 <div class="mobile-container">
     <div class="content-wrapper">
-        
-        <!-- Home Section -->
+
+        <!-- ══════════ HOME ══════════ -->
         <div id="homeSection" class="section-view">
-            
-            <!-- Market Indices -->
-            <div class="home-section">
-                <div class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    Market Overview
-                </div>
-                <div class="market-grid" id="marketIndices">
+
+            <!-- Market Ticker Strip -->
+            <div class="home-section" id="marketTickerWrap" style="overflow:hidden;">
+                <div id="marketIndices">
                     <div class="loading-spinner"><div class="spinner"></div></div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Quick Tools -->
             <div class="home-section">
                 <div class="section-title">
-                    <i class="fas fa-bolt"></i>
-                    Quick Tools
+                    <i class="fas fa-bolt"></i> Quick Tools
                 </div>
                 <div class="quick-actions">
                     <div class="action-card" onclick="showSection('stock')">
@@ -133,51 +147,28 @@
                 </div>
             </div>
 
-            <!-- Top Gainers/Losers -->
+            <!-- Top Gainers -->
             <div class="home-section">
                 <div class="section-title">
-                    <i class="fas fa-fire"></i>
-                    Top Gainers
+                    <i class="fas fa-fire"></i> Top Gainers
                 </div>
                 <div id="topGainersList" class="market-grid">
                     <div class="loading-spinner"><div class="spinner"></div></div>
                 </div>
             </div>
 
+            <!-- Top Losers -->
             <div class="home-section">
                 <div class="section-title">
-                    <i class="fas fa-arrow-down"></i>
-                    Top Losers
+                    <i class="fas fa-arrow-down"></i> Top Losers
                 </div>
                 <div id="topLosersList" class="market-grid">
                     <div class="loading-spinner"><div class="spinner"></div></div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Chat Section -->
-        <div id="chatSection" class="section-view hidden">
-            <div class="chat-container">
-                <div class="messages-container" id="messagesContainer"></div>
-                <div class="chat-input-container">
-                    <div class="chat-input-wrapper">
-                        <textarea 
-                            class="chat-input" 
-                            id="chatInput" 
-                            placeholder="Ask about stocks, EMI, SIP..."
-                            rows="1"
-                            onkeypress="handleChatKeypress(event)"
-                        ></textarea>
-                        <button class="chat-send-btn" onclick="sendChatMessage()">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stock Section -->
+        <!-- ══════════ STOCK SECTION ══════════ -->
         <div id="stockSection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -189,14 +180,13 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Enter Stock Name</label>
-                        <input 
-                            type="text" 
-                            id="stockInput" 
-                            class="form-control" 
+                        <input
+                            type="text"
+                            id="stockInput"
+                            class="form-control"
                             placeholder="e.g., Reliance, TCS, HDFC"
-                            list="stockSuggestions"
+                            onkeypress="if(event.key==='Enter') getStockInfo()"
                         >
-                        <datalist id="stockSuggestions"></datalist>
                     </div>
                     <button class="btn btn-primary btn-block" onclick="getStockInfo()">
                         <i class="fas fa-search"></i>
@@ -207,7 +197,7 @@
             <div id="stockResults"></div>
         </div>
 
-        <!-- EMI Calculator Section -->
+        <!-- ══════════ EMI SECTION ══════════ -->
         <div id="emiSection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -219,15 +209,15 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Loan Amount (₹)</label>
-                        <input type="number" id="emiAmount" class="form-control" placeholder="e.g., 500000">
+                        <input type="number" id="emiAmount" class="form-control" placeholder="e.g., 500000" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Interest Rate (% p.a.)</label>
-                        <input type="number" id="emiRate" class="form-control" placeholder="e.g., 8.5" step="0.1">
+                        <input type="number" id="emiRate" class="form-control" placeholder="e.g., 8.5" step="0.1" inputmode="decimal">
                     </div>
                     <div class="form-group">
                         <label>Tenure (Years)</label>
-                        <input type="number" id="emiTenure" class="form-control" placeholder="e.g., 5">
+                        <input type="number" id="emiTenure" class="form-control" placeholder="e.g., 5" inputmode="numeric">
                     </div>
                     <button class="btn btn-primary btn-block" onclick="calculateEMI()">
                         <i class="fas fa-calculator"></i>
@@ -238,7 +228,7 @@
             <div id="emiResults"></div>
         </div>
 
-        <!-- SIP Calculator Section -->
+        <!-- ══════════ SIP SECTION ══════════ -->
         <div id="sipSection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -250,15 +240,15 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Monthly Investment (₹)</label>
-                        <input type="number" id="sipAmount" class="form-control" placeholder="e.g., 5000">
+                        <input type="number" id="sipAmount" class="form-control" placeholder="e.g., 5000" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Expected Return (% p.a.)</label>
-                        <input type="number" id="sipRate" class="form-control" placeholder="e.g., 12" step="0.1">
+                        <input type="number" id="sipRate" class="form-control" placeholder="e.g., 12" step="0.1" inputmode="decimal">
                     </div>
                     <div class="form-group">
                         <label>Investment Period (Years)</label>
-                        <input type="number" id="sipTenure" class="form-control" placeholder="e.g., 10">
+                        <input type="number" id="sipTenure" class="form-control" placeholder="e.g., 10" inputmode="numeric">
                     </div>
                     <button class="btn btn-primary btn-block" onclick="calculateSIP()">
                         <i class="fas fa-calculator"></i>
@@ -269,7 +259,7 @@
             <div id="sipResults"></div>
         </div>
 
-        <!-- FD Calculator Section -->
+        <!-- ══════════ FD SECTION ══════════ -->
         <div id="fdSection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -281,15 +271,15 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Principal Amount (₹)</label>
-                        <input type="number" id="fdAmount" class="form-control" placeholder="e.g., 100000">
+                        <input type="number" id="fdAmount" class="form-control" placeholder="e.g., 100000" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Interest Rate (% p.a.)</label>
-                        <input type="number" id="fdRate" class="form-control" placeholder="e.g., 7" step="0.1">
+                        <input type="number" id="fdRate" class="form-control" placeholder="e.g., 7" step="0.1" inputmode="decimal">
                     </div>
                     <div class="form-group">
                         <label>Tenure (Years)</label>
-                        <input type="number" id="fdTenure" class="form-control" placeholder="e.g., 2">
+                        <input type="number" id="fdTenure" class="form-control" placeholder="e.g., 2" inputmode="numeric">
                     </div>
                     <button class="btn btn-primary btn-block" onclick="calculateFD()">
                         <i class="fas fa-calculator"></i>
@@ -300,7 +290,7 @@
             <div id="fdResults"></div>
         </div>
 
-        <!-- Mutual Funds Section -->
+        <!-- ══════════ MUTUAL FUNDS ══════════ -->
         <div id="mfSection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -312,10 +302,10 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Search Funds</label>
-                        <input 
-                            type="text" 
-                            id="mfSearchInput" 
-                            class="form-control" 
+                        <input
+                            type="text"
+                            id="mfSearchInput"
+                            class="form-control"
                             placeholder="Search by name..."
                             oninput="searchMutualFunds()"
                         >
@@ -333,7 +323,7 @@
             </div>
         </div>
 
-        <!-- Zakat Calculator Section -->
+        <!-- ══════════ ZAKAT ══════════ -->
         <div id="zakatSection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -345,35 +335,35 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Cash & Bank Balance (₹)</label>
-                        <input type="number" id="zakatCash" class="form-control" placeholder="0">
+                        <input type="number" id="zakatCash" class="form-control" placeholder="0" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Savings / FD (₹)</label>
-                        <input type="number" id="zakatSavings" class="form-control" placeholder="0">
+                        <input type="number" id="zakatSavings" class="form-control" placeholder="0" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Stocks Market Value (₹)</label>
-                        <input type="number" id="zakatStocks" class="form-control" placeholder="0">
+                        <input type="number" id="zakatStocks" class="form-control" placeholder="0" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Mutual Funds (₹)</label>
-                        <input type="number" id="zakatMF" class="form-control" placeholder="0">
+                        <input type="number" id="zakatMF" class="form-control" placeholder="0" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Business Assets (₹)</label>
-                        <input type="number" id="zakatBusiness" class="form-control" placeholder="0">
+                        <input type="number" id="zakatBusiness" class="form-control" placeholder="0" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label>Gold (grams)</label>
-                        <input type="number" id="zakatGold" class="form-control" placeholder="0">
+                        <input type="number" id="zakatGold" class="form-control" placeholder="0" inputmode="decimal">
                     </div>
                     <div class="form-group">
                         <label>Silver (grams)</label>
-                        <input type="number" id="zakatSilver" class="form-control" placeholder="0">
+                        <input type="number" id="zakatSilver" class="form-control" placeholder="0" inputmode="decimal">
                     </div>
                     <div class="form-group">
                         <label>Debts/Liabilities (₹)</label>
-                        <input type="number" id="zakatDebts" class="form-control" placeholder="0">
+                        <input type="number" id="zakatDebts" class="form-control" placeholder="0" inputmode="numeric">
                     </div>
                     <button class="btn btn-primary btn-block" onclick="calculateZakat()">
                         <i class="fas fa-calculator"></i>
@@ -384,7 +374,7 @@
             <div id="zakatResults"></div>
         </div>
 
-        <!-- Glossary Section -->
+        <!-- ══════════ GLOSSARY ══════════ -->
         <div id="glossarySection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -394,30 +384,29 @@
                     </h5>
                 </div>
                 <div class="widget-body">
-                    <div class="form-group">
-                        <input 
-                            type="text" 
-                            id="glossarySearch" 
-                            class="form-control" 
-                            placeholder="Search terms..."
-                            oninput="searchGlossary()"
-                        >
-                    </div>
+                    <input
+                        type="text"
+                        id="glossarySearch"
+                        class="form-control"
+                        placeholder="Search terms e.g. NAV, SIP, EMI..."
+                        oninput="searchGlossary()"
+                    >
                 </div>
             </div>
-            <div id="glossaryResults" class="glossary-list">
-                <div class="loading-spinner"><div class="spinner"></div></div>
-            </div>
+            <div id="glossaryResults" class="glossary-list"></div>
         </div>
 
-        <!-- News Section -->
+        <!-- ══════════ NEWS ══════════ -->
         <div id="newsSection" class="section-view hidden">
             <div class="widget-card">
-                <div class="widget-header">
+                <div class="widget-header" style="display:flex;align-items:center;justify-content:space-between;">
                     <h5 class="widget-title">
                         <i class="fas fa-newspaper"></i>
                         Market News
                     </h5>
+                    <button class="btn btn-secondary btn-sm" onclick="loadNews()" style="padding:6px 12px;font-size:13px;">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
             <div id="newsResults" class="news-list">
@@ -425,7 +414,7 @@
             </div>
         </div>
 
-        <!-- Currency Section -->
+        <!-- ══════════ CURRENCY ══════════ -->
         <div id="currencySection" class="section-view hidden">
             <div class="widget-card">
                 <div class="widget-header">
@@ -437,54 +426,70 @@
                 <div class="widget-body">
                     <div class="form-group">
                         <label>Amount</label>
-                        <input type="number" id="currencyAmount" class="form-control" value="1" min="0" step="any">
+                        <input type="number" id="currencyAmount" class="form-control" value="100" min="0" step="any" inputmode="decimal" oninput="convertCurrency()">
                     </div>
                     <div class="form-group">
                         <label>From</label>
                         <select id="currencyFrom" class="custom-select" onchange="convertCurrency()">
-                            <option value="USD">USD - US Dollar</option>
+                            <option value="USD" selected>USD - US Dollar</option>
                             <option value="EUR">EUR - Euro</option>
                             <option value="GBP">GBP - British Pound</option>
                             <option value="JPY">JPY - Japanese Yen</option>
-                            <option value="INR" selected>INR - Indian Rupee</option>
+                            <option value="AED">AED - UAE Dirham</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="CHF">CHF - Swiss Franc</option>
+                            <option value="CNY">CNY - Chinese Yuan</option>
+                            <option value="INR">INR - Indian Rupee</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>To</label>
                         <select id="currencyTo" class="custom-select" onchange="convertCurrency()">
-                            <option value="USD" selected>USD - US Dollar</option>
+                            <option value="USD">USD - US Dollar</option>
                             <option value="EUR">EUR - Euro</option>
                             <option value="GBP">GBP - British Pound</option>
                             <option value="JPY">JPY - Japanese Yen</option>
-                            <option value="INR">INR - Indian Rupee</option>
+                            <option value="AED">AED - UAE Dirham</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="CHF">CHF - Swiss Franc</option>
+                            <option value="CNY">CNY - Chinese Yuan</option>
+                            <option value="INR" selected>INR - Indian Rupee</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div id="currencyResults"></div>
+            <!-- All rates table -->
+            <div id="currencyRatesTable"></div>
         </div>
 
-        <!-- Metals Section -->
+        <!-- ══════════ METALS ══════════ -->
         <div id="metalsSection" class="section-view hidden">
             <div class="widget-card">
-                <div class="widget-header">
+                <div class="widget-header" style="display:flex;align-items:center;justify-content:space-between;">
                     <h5 class="widget-title">
                         <i class="fas fa-gem"></i>
                         Gold & Silver Prices
                     </h5>
+                    <button class="btn btn-secondary btn-sm" onclick="loadMetals()" style="padding:6px 12px;font-size:13px;">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
-            <div id="metalsResults" class="market-grid">
+            <div id="metalsResults">
                 <div class="loading-spinner"><div class="spinner"></div></div>
             </div>
         </div>
 
-        <!-- Tools Section -->
+        <!-- ══════════ TOOLS SECTION (nav shortcut) ══════════ -->
         <div id="toolsSection" class="section-view hidden">
             <div class="home-section">
                 <div class="section-title">
-                    <i class="fas fa-calculator"></i>
-                    Calculators
+                    <i class="fas fa-calculator"></i> Calculators
                 </div>
                 <div class="quick-actions">
                     <div class="action-card" onclick="showSection('emi')">
@@ -505,10 +510,67 @@
                     </div>
                 </div>
             </div>
+            <div class="home-section">
+                <div class="section-title">
+                    <i class="fas fa-chart-bar"></i> Market Tools
+                </div>
+                <div class="quick-actions">
+                    <div class="action-card" onclick="showSection('currency')">
+                        <div class="action-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="action-title">Currency</div>
+                    </div>
+                    <div class="action-card" onclick="showSection('metals')">
+                        <div class="action-icon"><i class="fas fa-gem"></i></div>
+                        <div class="action-title">Gold & Silver</div>
+                    </div>
+                    <div class="action-card" onclick="showSection('news')">
+                        <div class="action-icon"><i class="fas fa-newspaper"></i></div>
+                        <div class="action-title">Market News</div>
+                    </div>
+                    <div class="action-card" onclick="showSection('glossary')">
+                        <div class="action-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="action-title">Glossary</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </div>
-</div>
+        <!-- ══════════ CHAT ══════════ -->
+        <div id="chatSection" class="section-view hidden">
+            <div class="chat-container">
+                <div class="messages-container" id="messagesContainer">
+                    <!-- welcome message -->
+                    <div class="message bot">
+                        <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                        <div class="message-content">
+                            👋 Hi! I'm your Virtual Finance Assistant.<br><br>
+                            You can ask me about:<br>
+                            • Stock prices — <em>"price of TCS"</em><br>
+                            • EMI — <em>"EMI for 5L at 8% for 3 years"</em><br>
+                            • SIP — <em>"SIP 5000 monthly for 10 years at 12%"</em><br>
+                            • FD — <em>"FD 1L at 7% for 2 years"</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea
+                            class="chat-input"
+                            id="chatInput"
+                            placeholder="Ask about stocks, EMI, SIP..."
+                            rows="1"
+                            onkeypress="handleChatKeypress(event)"
+                        ></textarea>
+                        <button class="chat-send-btn" onclick="sendChatMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- content-wrapper -->
+</div><!-- mobile-container -->
 
 <!-- Bottom Navigation -->
 <nav class="bottom-nav">
@@ -535,703 +597,819 @@
 </nav>
 
 <script>
-
-// ═══════════════════════════════════════════════════════════════════════════
-// GLOBAL STATE & UTILITIES
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ═══════════════════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════════════════════════════
 let currentSection = 'home';
 let allMutualFunds = [];
-let stockLogos = {};
+let newsLoaded    = false;
+let currencyLoaded = false;
+let metalsLoaded  = false;
+let glossaryLoaded = false;
+let mfLoaded      = false;
 
-// Load stock logos
-$.getJSON("{{ url_for('static', filename='stock_logos.json') }}", function(data) {
-    stockLogos = data;
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// NAVIGATION & UI FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
-function toggleMenu() {
-    const drawer = document.getElementById('menuDrawer');
-    const overlay = document.getElementById('menuOverlay');
-    drawer.classList.toggle('open');
-    overlay.classList.toggle('active');
+// ═══════════════════════════════════════════════════════════════════════
+// HELPER: format Indian currency
+// ═══════════════════════════════════════════════════════════════════════
+function fmtINR(n) {
+    if (n == null || isNaN(n)) return '—';
+    return Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════
+function toggleMenu() {
+    $('#menuDrawer').toggleClass('open');
+    $('#menuOverlay').toggleClass('active');
+}
 function closeMenu() {
-    const drawer = document.getElementById('menuDrawer');
-    const overlay = document.getElementById('menuOverlay');
-    drawer.classList.remove('open');
-    overlay.classList.remove('active');
+    $('#menuDrawer').removeClass('open');
+    $('#menuOverlay').removeClass('active');
 }
 
 function showSection(section) {
-    // Hide all sections
     document.querySelectorAll('.section-view').forEach(el => el.classList.add('hidden'));
-    
-    // Show selected section
-    const sectionId = section + 'Section';
-    const sectionEl = document.getElementById(sectionId);
-    if (sectionEl) {
-        sectionEl.classList.remove('hidden');
-        currentSection = section;
-        
-        // Update bottom nav
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('data-section') === section) {
-                item.classList.add('active');
-            }
-        });
-        
-        // Load data if needed
-        if (section === 'mf' && allMutualFunds.length === 0) {
-            loadMutualFunds();
-        } else if (section === 'glossary') {
-            loadGlossary();
-        } else if (section === 'news') {
-            loadNews();
-        } else if (section === 'currency') {
-            loadCurrency();
-        } else if (section === 'metals') {
-            loadMetals();
-        }
-        
-        // Scroll to top
-        window.scrollTo(0, 0);
-    }
+    const el = document.getElementById(section + 'Section');
+    if (!el) return;
+    el.classList.remove('hidden');
+    currentSection = section;
+
+    // Update bottom nav highlight
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.section === section);
+    });
+
+    // Lazy-load section data on first visit
+    if (section === 'mf' && !mfLoaded)       { mfLoaded = true;       loadMutualFunds(); }
+    if (section === 'glossary' && !glossaryLoaded) { glossaryLoaded = true; loadGlossary(); }
+    if (section === 'news' && !newsLoaded)    { newsLoaded = true;     loadNews(); }
+    if (section === 'currency' && !currencyLoaded) { currencyLoaded = true; loadCurrencyRates(); convertCurrency(); }
+    if (section === 'metals' && !metalsLoaded) { metalsLoaded = true;  loadMetals(); }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MARKET DATA FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ═══════════════════════════════════════════════════════════════════════
+// HOME — Market indices & movers
+// ═══════════════════════════════════════════════════════════════════════
 function loadMarketIndices() {
-    $.getJSON('/market_indices', function(data) {
-        let html = '';
-        data.forEach(index => {
-            const changeClass = index.change >= 0 ? 'positive' : 'negative';
-            const changeIcon = index.change >= 0 ? '▲' : '▼';
-            html += `
-                <div class="market-card">
-                    <div class="market-header">
-                        <div class="market-name">${index.name}</div>
-                    </div>
-                    <div class="market-value">${index.value.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                    <div class="market-change ${changeClass}">
-                        ${changeIcon} ${Math.abs(index.change).toFixed(2)} (${Math.abs(index.change_pct).toFixed(2)}%)
-                    </div>
-                </div>
-            `;
+    $.getJSON('/market_indices')
+        .done(function(data) {
+            if (!data || !data.length) {
+                $('#marketIndices').html('<p style="color:var(--muted);font-size:13px;padding:8px 0;">Market data unavailable</p>');
+                return;
+            }
+            let html = '<div class="market-grid">';
+            data.forEach(idx => {
+                const up  = idx.change >= 0;
+                const cls = up ? 'positive' : 'negative';
+                const ico = up ? '▲' : '▼';
+                html += `
+                    <div class="market-card">
+                        <div class="market-header">
+                            <div class="market-name">${idx.name || idx.indexSymbol || ''}</div>
+                        </div>
+                        <div class="market-value">${fmtINR(idx.value ?? idx.last)}</div>
+                        <div class="market-change ${cls}">
+                            ${ico} ${Math.abs(idx.change || idx.variation || 0).toFixed(2)}
+                            (${Math.abs(idx.change_pct || idx.percentChange || 0).toFixed(2)}%)
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            $('#marketIndices').html(html);
+        })
+        .fail(function() {
+            $('#marketIndices').html('<p style="color:var(--muted);font-size:13px;padding:8px 0;">Unable to load market data</p>');
         });
-        $('#marketIndices').html(html);
-    }).fail(function() {
-        $('#marketIndices').html('<div class="empty-state"><div class="empty-text">Unable to load market data</div></div>');
-    });
 }
 
 function loadTopGainers() {
-    $.getJSON('/nifty_gainers', function(data) {
-        let html = '';
-        data.slice(0, 5).forEach(stock => {
-            html += `
-                <div class="market-card">
-                    <div class="market-header">
-                        <div class="market-name">${stock.symbol}</div>
-                    </div>
-                    <div class="market-value">₹${stock.lastPrice.toFixed(2)}</div>
-                    <div class="market-change positive">
-                        ▲ ${stock.change.toFixed(2)} (${stock.pChange.toFixed(2)}%)
-                    </div>
-                </div>
-            `;
-        });
-        $('#topGainersList').html(html);
-    }).fail(function() {
-        $('#topGainersList').html('<div class="empty-state"><div class="empty-text">Unable to load gainers</div></div>');
-    });
+    $.getJSON('/nifty_gainers')
+        .done(function(data) {
+            if (!data || !data.length) { $('#topGainersList').html(emptyState('No gainers data')); return; }
+            let html = '';
+            data.slice(0, 5).forEach(s => {
+                html += `
+                    <div class="market-card">
+                        <div class="market-header"><div class="market-name">${s.symbol}</div></div>
+                        <div class="market-value">₹${fmtINR(s.lastPrice)}</div>
+                        <div class="market-change positive">▲ ${Number(s.change||s.netPrice||0).toFixed(2)} (${Number(s.pChange||s.percentChange||0).toFixed(2)}%)</div>
+                    </div>`;
+            });
+            $('#topGainersList').html(html);
+        })
+        .fail(function() { $('#topGainersList').html(emptyState('Unable to load gainers')); });
 }
 
 function loadTopLosers() {
-    $.getJSON('/nifty_losers', function(data) {
-        let html = '';
-        data.slice(0, 5).forEach(stock => {
-            html += `
-                <div class="market-card">
-                    <div class="market-header">
-                        <div class="market-name">${stock.symbol}</div>
-                    </div>
-                    <div class="market-value">₹${stock.lastPrice.toFixed(2)}</div>
-                    <div class="market-change negative">
-                        ▼ ${Math.abs(stock.change).toFixed(2)} (${Math.abs(stock.pChange).toFixed(2)}%)
-                    </div>
-                </div>
-            `;
-        });
-        $('#topLosersList').html(html);
-    }).fail(function() {
-        $('#topLosersList').html('<div class="empty-state"><div class="empty-text">Unable to load losers</div></div>');
-    });
+    $.getJSON('/nifty_losers')
+        .done(function(data) {
+            if (!data || !data.length) { $('#topLosersList').html(emptyState('No losers data')); return; }
+            let html = '';
+            data.slice(0, 5).forEach(s => {
+                html += `
+                    <div class="market-card">
+                        <div class="market-header"><div class="market-name">${s.symbol}</div></div>
+                        <div class="market-value">₹${fmtINR(s.lastPrice)}</div>
+                        <div class="market-change negative">▼ ${Math.abs(Number(s.change||s.netPrice||0)).toFixed(2)} (${Math.abs(Number(s.pChange||s.percentChange||0)).toFixed(2)}%)</div>
+                    </div>`;
+            });
+            $('#topLosersList').html(html);
+        })
+        .fail(function() { $('#topLosersList').html(emptyState('Unable to load losers')); });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// STOCK INFORMATION
-// ═══════════════════════════════════════════════════════════════════════════
+function emptyState(msg) {
+    return `<div class="empty-state"><div class="empty-text">${msg}</div></div>`;
+}
 
+// ═══════════════════════════════════════════════════════════════════════
+// STOCK INFO  — uses /get_stock (POST, returns full JSON)
+// ═══════════════════════════════════════════════════════════════════════
 function getStockInfo() {
     const query = $('#stockInput').val().trim();
-    if (!query) {
-        alert('Please enter a stock name');
-        return;
-    }
-    
+    if (!query) { alert('Please enter a stock name'); return; }
+
     $('#stockResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
-    
-    $.post('/chat', { msg: `price of ${query}` }, function(response) {
-        if (response.includes('₹') || response.includes('Price')) {
-            displayStockResult(response, query);
-        } else {
-            $('#stockResults').html(`<div class="widget-card"><div class="widget-body"><div class="empty-state"><div class="empty-text">${response}</div></div></div></div>`);
+
+    $.post('/get_stock', { symbol: query }, function(data) {
+        if (data.error) {
+            $('#stockResults').html(`<div class="widget-card"><div class="widget-body">${emptyState(data.error)}</div></div>`);
+            return;
         }
-    }).fail(function() {
-        $('#stockResults').html('<div class="widget-card"><div class="widget-body"><div class="empty-state"><div class="empty-text">Unable to fetch stock data</div></div></div></div>');
+
+        const up  = (data.change || 0) >= 0;
+        const cls = up ? 'positive' : 'negative';
+        const ico = up ? '▲' : '▼';
+
+        let weekHtml = '';
+        if (data.week_open) {
+            const wUp  = (data.week_change || 0) >= 0;
+            const wCls = wUp ? 'positive' : 'negative';
+            const wIco = wUp ? '▲' : '▼';
+            weekHtml = `
+                <div style="margin-top:16px;">
+                    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">This Week</div>
+                    <div class="stock-stats">
+                        <div class="stat-item"><div class="stat-label">Week Open</div><div class="stat-value">₹${fmtINR(data.week_open)}</div></div>
+                        <div class="stat-item"><div class="stat-label">Week Close</div><div class="stat-value">₹${fmtINR(data.week_close)}</div></div>
+                        <div class="stat-item"><div class="stat-label">Week High</div><div class="stat-value" style="color:var(--green)">₹${fmtINR(data.week_high)}</div></div>
+                        <div class="stat-item"><div class="stat-label">Week Low</div><div class="stat-value" style="color:var(--red)">₹${fmtINR(data.week_low)}</div></div>
+                    </div>
+                    <div style="margin-top:8px;"><span class="market-change ${wCls}">${wIco} ${Math.abs(data.week_change||0).toFixed(2)} (${Math.abs(data.week_pct||0).toFixed(2)}%)</span></div>
+                </div>`;
+        }
+
+        const html = `
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-info">
+                        <div class="stock-name">${data.symbol}</div>
+                        <div class="stock-symbol">NSE India</div>
+                    </div>
+                </div>
+                <div class="stock-price">₹${fmtINR(data.current)}</div>
+                <span class="stock-change ${cls}">${ico} ${Math.abs(data.change||0).toFixed(2)} (${Math.abs(data.change_pct||0).toFixed(2)}%)</span>
+                <div style="margin-top:16px;">
+                    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Today</div>
+                    <div class="stock-stats">
+                        <div class="stat-item"><div class="stat-label">Open</div><div class="stat-value">₹${fmtINR(data.open)}</div></div>
+                        <div class="stat-item"><div class="stat-label">Prev Close</div><div class="stat-value">₹${fmtINR(data.prev_close)}</div></div>
+                        <div class="stat-item"><div class="stat-label">Day High</div><div class="stat-value" style="color:var(--green)">₹${fmtINR(data.day_high)}</div></div>
+                        <div class="stat-item"><div class="stat-label">Day Low</div><div class="stat-value" style="color:var(--red)">₹${fmtINR(data.day_low)}</div></div>
+                    </div>
+                </div>
+                ${weekHtml}
+                <div style="margin-top:16px;display:flex;gap:8px;">
+                    <button class="btn btn-secondary btn-sm" onclick="$('#stockInput').val('');$('#stockResults').html('');">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="getStockInfo()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>`;
+        $('#stockResults').html(html);
+    }, 'json').fail(function() {
+        $('#stockResults').html(`<div class="widget-card"><div class="widget-body">${emptyState('Unable to fetch stock data')}</div></div>`);
     });
 }
 
-function displayStockResult(html, query) {
-    $('#stockResults').html(`<div class="widget-card"><div class="widget-body">${html}</div></div>`);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CALCULATOR FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ═══════════════════════════════════════════════════════════════════════
+// CALCULATORS
+// ═══════════════════════════════════════════════════════════════════════
 function calculateEMI() {
-    const amount = parseFloat($('#emiAmount').val());
-    const rate = parseFloat($('#emiRate').val()) / 100 / 12;
-    const tenure = parseFloat($('#emiTenure').val()) * 12;
-    
-    if (!amount || !rate || !tenure) {
-        alert('Please fill all fields');
-        return;
+    const principal = parseFloat($('#emiAmount').val());
+    const annualRate = parseFloat($('#emiRate').val());
+    const years = parseFloat($('#emiTenure').val());
+
+    if (!principal || !annualRate || !years) { alert('Please fill all fields'); return; }
+
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+    const emi = (principal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const total = emi * n;
+    const interest = total - principal;
+
+    // Year-by-year amortisation
+    let balance = principal;
+    let amort = '';
+    for (let y = 1; y <= years; y++) {
+        let yPrincipal = 0, yInterest = 0;
+        for (let m = 0; m < 12 && balance > 0; m++) {
+            const iMonth = balance * r;
+            const pMonth = Math.min(emi - iMonth, balance);
+            yInterest  += iMonth;
+            yPrincipal += pMonth;
+            balance    -= pMonth;
+        }
+        amort += `<tr>
+            <td>Y${y}</td>
+            <td style="color:var(--accent)">₹${fmtINR(yPrincipal)}</td>
+            <td style="color:var(--red)">₹${fmtINR(yInterest)}</td>
+            <td>₹${fmtINR(Math.max(balance, 0))}</td>
+        </tr>`;
     }
-    
-    const emi = (amount * rate * Math.pow(1 + rate, tenure)) / (Math.pow(1 + rate, tenure) - 1);
-    const totalAmount = emi * tenure;
-    const totalInterest = totalAmount - amount;
-    
-    const html = `
+
+    const principalPct = ((principal / total) * 100).toFixed(1);
+    const interestPct  = (100 - principalPct).toFixed(1);
+
+    $('#emiResults').html(`
         <div class="result-card">
             <div class="result-main">
                 <div class="result-label">Monthly EMI</div>
-                <div class="result-value">₹${emi.toFixed(0).toLocaleString('en-IN')}</div>
+                <div class="result-value">₹${fmtINR(emi)}</div>
+                <div style="font-size:13px;color:var(--text-2);margin-top:4px;">for ${n} months at ${annualRate}% p.a.</div>
             </div>
             <div class="result-details">
                 <div class="detail-item">
-                    <div class="detail-label">Principal</div>
-                    <div class="detail-value">₹${amount.toLocaleString('en-IN')}</div>
+                    <div class="detail-label">Loan Amount</div>
+                    <div class="detail-value">₹${fmtINR(principal)}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Interest</div>
-                    <div class="detail-value">₹${totalInterest.toFixed(0).toLocaleString('en-IN')}</div>
+                    <div class="detail-label">Total Payment</div>
+                    <div class="detail-value">₹${fmtINR(total)}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Total Amount</div>
-                    <div class="detail-value">₹${totalAmount.toFixed(0).toLocaleString('en-IN')}</div>
+                    <div class="detail-label">Total Interest</div>
+                    <div class="detail-value" style="color:var(--red)">₹${fmtINR(interest)}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Tenure</div>
-                    <div class="detail-value">${tenure} months</div>
+                    <div class="detail-label">Interest %</div>
+                    <div class="detail-value">${interestPct}%</div>
                 </div>
             </div>
         </div>
-    `;
-    $('#emiResults').html(html);
+        <div class="widget-card" style="margin-top:12px;">
+            <div class="widget-header"><h5 class="widget-title">Year-by-Year Amortisation</h5></div>
+            <div class="widget-body" style="padding:0;overflow-x:auto;">
+                <table class="table" style="margin:0;">
+                    <thead><tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead>
+                    <tbody>${amort}</tbody>
+                </table>
+            </div>
+        </div>`);
 }
 
 function calculateSIP() {
     const monthly = parseFloat($('#sipAmount').val());
-    const rate = parseFloat($('#sipRate').val()) / 100 / 12;
-    const tenure = parseFloat($('#sipTenure').val()) * 12;
-    
-    if (!monthly || !rate || !tenure) {
-        alert('Please fill all fields');
-        return;
+    const annualRate = parseFloat($('#sipRate').val());
+    const years = parseFloat($('#sipTenure').val());
+
+    if (!monthly || !annualRate || !years) { alert('Please fill all fields'); return; }
+
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+    const maturity = monthly * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+    const invested = monthly * n;
+    const returns  = maturity - invested;
+
+    // Year-by-year
+    let rows = '';
+    for (let y = 1; y <= years; y++) {
+        const ny = y * 12;
+        const val = monthly * ((Math.pow(1 + r, ny) - 1) / r) * (1 + r);
+        const inv = monthly * ny;
+        rows += `<tr>
+            <td>Y${y}</td>
+            <td style="color:var(--accent)">₹${fmtINR(inv)}</td>
+            <td style="color:var(--green)">₹${fmtINR(val)}</td>
+            <td style="color:var(--green)">₹${fmtINR(val - inv)}</td>
+        </tr>`;
     }
-    
-    const maturity = monthly * ((Math.pow(1 + rate, tenure) - 1) / rate) * (1 + rate);
-    const invested = monthly * tenure;
-    const returns = maturity - invested;
-    
-    const html = `
+
+    $('#sipResults').html(`
         <div class="result-card">
             <div class="result-main">
                 <div class="result-label">Maturity Amount</div>
-                <div class="result-value">₹${maturity.toFixed(0).toLocaleString('en-IN')}</div>
+                <div class="result-value">₹${fmtINR(maturity)}</div>
             </div>
             <div class="result-details">
                 <div class="detail-item">
                     <div class="detail-label">Invested</div>
-                    <div class="detail-value">₹${invested.toLocaleString('en-IN')}</div>
+                    <div class="detail-value">₹${fmtINR(invested)}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Returns</div>
-                    <div class="detail-value">₹${returns.toFixed(0).toLocaleString('en-IN')}</div>
+                    <div class="detail-value" style="color:var(--green)">₹${fmtINR(returns)}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Monthly SIP</div>
-                    <div class="detail-value">₹${monthly.toLocaleString('en-IN')}</div>
+                    <div class="detail-value">₹${fmtINR(monthly)}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Period</div>
-                    <div class="detail-value">${tenure} months</div>
+                    <div class="detail-value">${n} months</div>
                 </div>
             </div>
         </div>
-    `;
-    $('#sipResults').html(html);
+        <div class="widget-card" style="margin-top:12px;">
+            <div class="widget-header"><h5 class="widget-title">Year-by-Year Growth</h5></div>
+            <div class="widget-body" style="padding:0;overflow-x:auto;">
+                <table class="table" style="margin:0;">
+                    <thead><tr><th>Year</th><th>Invested</th><th>Value</th><th>Gain</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        </div>`);
 }
 
 function calculateFD() {
     const principal = parseFloat($('#fdAmount').val());
-    const rate = parseFloat($('#fdRate').val()) / 100;
-    const tenure = parseFloat($('#fdTenure').val());
-    
-    if (!principal || !rate || !tenure) {
-        alert('Please fill all fields');
-        return;
-    }
-    
-    const maturity = principal * Math.pow(1 + rate, tenure);
+    const annualRate = parseFloat($('#fdRate').val());
+    const years = parseFloat($('#fdTenure').val());
+
+    if (!principal || !annualRate || !years) { alert('Please fill all fields'); return; }
+
+    // Quarterly compounding (standard FD)
+    const n = 4; // quarters per year
+    const maturity = principal * Math.pow(1 + annualRate / (100 * n), n * years);
     const interest = maturity - principal;
-    
-    const html = `
+
+    $('#fdResults').html(`
         <div class="result-card">
             <div class="result-main">
                 <div class="result-label">Maturity Amount</div>
-                <div class="result-value">₹${maturity.toFixed(0).toLocaleString('en-IN')}</div>
+                <div class="result-value">₹${fmtINR(maturity)}</div>
             </div>
             <div class="result-details">
                 <div class="detail-item">
                     <div class="detail-label">Principal</div>
-                    <div class="detail-value">₹${principal.toLocaleString('en-IN')}</div>
+                    <div class="detail-value">₹${fmtINR(principal)}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Interest</div>
-                    <div class="detail-value">₹${interest.toFixed(0).toLocaleString('en-IN')}</div>
+                    <div class="detail-label">Interest Earned</div>
+                    <div class="detail-value" style="color:var(--green)">₹${fmtINR(interest)}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Rate</div>
-                    <div class="detail-value">${(rate * 100).toFixed(2)}%</div>
+                    <div class="detail-label">Rate (p.a.)</div>
+                    <div class="detail-value">${annualRate}%</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Tenure</div>
-                    <div class="detail-value">${tenure} years</div>
+                    <div class="detail-value">${years} year${years !== 1 ? 's' : ''}</div>
                 </div>
             </div>
-        </div>
-    `;
-    $('#fdResults').html(html);
+        </div>`);
 }
 
 function calculateZakat() {
-    const cash = parseFloat($('#zakatCash').val()) || 0;
-    const savings = parseFloat($('#zakatSavings').val()) || 0;
-    const stocks = parseFloat($('#zakatStocks').val()) || 0;
-    const mf = parseFloat($('#zakatMF').val()) || 0;
+    const cash     = parseFloat($('#zakatCash').val())     || 0;
+    const savings  = parseFloat($('#zakatSavings').val())  || 0;
+    const stocks   = parseFloat($('#zakatStocks').val())   || 0;
+    const mf       = parseFloat($('#zakatMF').val())       || 0;
     const business = parseFloat($('#zakatBusiness').val()) || 0;
-    const goldG = parseFloat($('#zakatGold').val()) || 0;
-    const silverG = parseFloat($('#zakatSilver').val()) || 0;
-    const debts = parseFloat($('#zakatDebts').val()) || 0;
-    
+    const goldG    = parseFloat($('#zakatGold').val())     || 0;
+    const silverG  = parseFloat($('#zakatSilver').val())   || 0;
+    const debts    = parseFloat($('#zakatDebts').val())    || 0;
+
     $('#zakatResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
-    
-    // Fetch live gold/silver prices
+
     $.getJSON('/metals')
         .done(function(d) {
-            const goldPerGram = d.gold ? d.gold.price_inr / 10 : 7500;
+            const goldPerGram   = d.gold   ? d.gold.price_inr / 10   : 7500;
             const silverPerGram = d.silver ? d.silver.price_inr / 1000 : 90;
-            
-            const nisab = 85 * goldPerGram;
-            const goldValue = goldG * goldPerGram;
-            const silverValue = silverG * silverPerGram;
-            
-            const grossWealth = cash + savings + stocks + mf + business + goldValue + silverValue;
-            const netWealth = grossWealth - debts;
-            const zakatDue = netWealth >= nisab ? netWealth * 0.025 : 0;
-            const eligible = netWealth >= nisab;
-            
-            const html = `
+            const nisab         = 85 * goldPerGram;
+            const goldValue     = goldG   * goldPerGram;
+            const silverValue   = silverG * silverPerGram;
+            const grossWealth   = cash + savings + stocks + mf + business + goldValue + silverValue;
+            const netWealth     = grossWealth - debts;
+            const eligible      = netWealth >= nisab;
+            const zakatDue      = eligible ? netWealth * 0.025 : 0;
+
+            $('#zakatResults').html(`
                 <div class="result-card">
                     <div class="result-main">
                         <div class="result-label">${eligible ? 'Zakat Due (2.5%)' : 'Zakat Not Applicable'}</div>
-                        <div class="result-value">${eligible ? '₹' + zakatDue.toFixed(0).toLocaleString('en-IN') : '—'}</div>
+                        <div class="result-value" style="color:${eligible ? 'var(--accent)' : 'var(--muted)'}">
+                            ${eligible ? '₹' + fmtINR(zakatDue) : '—'}
+                        </div>
                         <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-2);">
-                            ${eligible ? `Net wealth exceeds Nisab of ₹${nisab.toFixed(0).toLocaleString('en-IN')}` : `Net wealth below Nisab of ₹${nisab.toFixed(0).toLocaleString('en-IN')}`}
+                            ${eligible
+                                ? `Net wealth ₹${fmtINR(netWealth)} exceeds Nisab ₹${fmtINR(nisab)}`
+                                : `Net wealth ₹${fmtINR(netWealth)} is below Nisab ₹${fmtINR(nisab)}`}
                         </div>
                     </div>
                     <div class="result-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Gross Wealth</div>
-                            <div class="detail-value">₹${grossWealth.toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Debts</div>
-                            <div class="detail-value">₹${debts.toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Net Wealth</div>
-                            <div class="detail-value">₹${netWealth.toFixed(0).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Nisab (85g Gold)</div>
-                            <div class="detail-value">₹${nisab.toFixed(0).toLocaleString('en-IN')}</div>
-                        </div>
+                        <div class="detail-item"><div class="detail-label">Gross Wealth</div><div class="detail-value">₹${fmtINR(grossWealth)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Debts</div><div class="detail-value">₹${fmtINR(debts)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Net Wealth</div><div class="detail-value">₹${fmtINR(netWealth)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Nisab (85g Gold)</div><div class="detail-value">₹${fmtINR(nisab)}</div></div>
                     </div>
-                </div>
-            `;
-            $('#zakatResults').html(html);
+                </div>`);
         })
         .fail(function() {
-            $('#zakatResults').html('<div class="empty-state"><div class="empty-text">Unable to fetch live gold prices</div></div>');
+            $('#zakatResults').html(emptyState('Unable to fetch live gold prices'));
         });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // MUTUAL FUNDS
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ═══════════════════════════════════════════════════════════════════════
 function loadMutualFunds() {
+    $('#mfResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
     $.getJSON('/mf_list', function(data) {
         allMutualFunds = data.funds || [];
-        
-        // Populate category filter
-        const categories = [...new Set(allMutualFunds.map(f => f.cat))].sort();
-        let categoryHtml = '<option value="">All Categories</option>';
-        categories.forEach(cat => {
-            categoryHtml += `<option value="${cat}">${cat}</option>`;
-        });
-        $('#mfCategoryFilter').html(categoryHtml);
-        
+
+        const cats = [...new Set(allMutualFunds.map(f => f.cat))].sort();
+        let catHtml = '<option value="">All Categories</option>';
+        cats.forEach(c => { catHtml += `<option value="${c}">${c}</option>`; });
+        $('#mfCategoryFilter').html(catHtml);
+
         displayMutualFunds(allMutualFunds.slice(0, 50));
     }).fail(function() {
-        $('#mfResults').html('<div class="empty-state"><div class="empty-text">Unable to load mutual funds</div></div>');
+        $('#mfResults').html(emptyState('Unable to load mutual funds'));
     });
 }
 
 function displayMutualFunds(funds) {
+    if (!funds.length) { $('#mfResults').html(emptyState('No funds found')); return; }
     let html = '';
-    funds.forEach(fund => {
+    funds.forEach(f => {
         html += `
-            <div class="mf-item" onclick="showMFDetail(${fund.code})">
-                <div class="mf-name">${fund.name}</div>
-                <span class="mf-category">${fund.cat}</span>
-            </div>
-        `;
+            <div class="mf-item" onclick="showMFDetail(${f.code})">
+                <div class="mf-name">${f.name}</div>
+                <span class="mf-category">${f.cat}</span>
+            </div>`;
     });
-    $('#mfResults').html(html || '<div class="empty-state"><div class="empty-text">No funds found</div></div>');
+    $('#mfResults').html(html);
 }
 
 function searchMutualFunds() {
-    const query = $('#mfSearchInput').val().toLowerCase();
-    const category = $('#mfCategoryFilter').val();
-    
+    const q   = $('#mfSearchInput').val().toLowerCase();
+    const cat = $('#mfCategoryFilter').val();
     let filtered = allMutualFunds;
-    if (query) {
-        filtered = filtered.filter(f => f.name.toLowerCase().includes(query));
-    }
-    if (category) {
-        filtered = filtered.filter(f => f.cat === category);
-    }
-    
+    if (q)   filtered = filtered.filter(f => f.name.toLowerCase().includes(q));
+    if (cat) filtered = filtered.filter(f => f.cat === cat);
     displayMutualFunds(filtered.slice(0, 50));
 }
-
-function filterMutualFunds() {
-    searchMutualFunds();
-}
+function filterMutualFunds() { searchMutualFunds(); }
 
 function showMFDetail(code) {
     $('#mfResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
-    
     $.getJSON(`/mf_detail/${code}`, function(data) {
-        const html = `
+        const r1 = data.return_1y, r3 = data.return_3y, r5 = data.return_5y;
+
+        const retBadge = (label, val) => val == null ? '' :
+            `<div class="detail-item">
+                <div class="detail-label">${label}</div>
+                <div class="detail-value" style="color:${val>=0?'var(--green)':'var(--red)'}">
+                    ${val>=0?'+':''}${val.toFixed(2)}%
+                </div>
+            </div>`;
+
+        $('#mfResults').html(`
             <div class="widget-card">
                 <div class="widget-header">
-                    <h5 class="widget-title">${data.schemeName}</h5>
+                    <h5 class="widget-title" style="font-size:14px;flex-wrap:wrap;">${data.schemeName}</h5>
                 </div>
                 <div class="widget-body">
-                    <div class="stat-item mb-2">
+                    <div class="stat-item" style="margin-bottom:8px;">
                         <div class="stat-label">Fund House</div>
-                        <div class="stat-value">${data.fundHouse}</div>
+                        <div class="stat-value" style="font-size:14px;">${data.fundHouse}</div>
                     </div>
-                    <div class="stat-item mb-2">
-                        <div class="stat-label">Latest NAV (${data.navDate})</div>
-                        <div class="stat-value">₹${data.latestNAV.toFixed(2)}</div>
+                    <div style="background:linear-gradient(135deg,var(--accent-light),#dbeafe);border-radius:var(--radius);padding:16px;margin-bottom:12px;text-align:center;">
+                        <div style="font-size:12px;color:var(--text-2);font-weight:600;">LATEST NAV (${data.navDate})</div>
+                        <div style="font-size:32px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;">₹${Number(data.latestNAV).toFixed(4)}</div>
                     </div>
-                    ${data.return_1y ? `
-                        <div class="result-details mt-3">
-                            <div class="detail-item">
-                                <div class="detail-label">1 Year Return</div>
-                                <div class="detail-value ${data.return_1y >= 0 ? 'text-success' : 'text-danger'}">
-                                    ${data.return_1y >= 0 ? '+' : ''}${data.return_1y.toFixed(2)}%
-                                </div>
-                            </div>
-                            ${data.return_3y ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">3 Year Return</div>
-                                    <div class="detail-value ${data.return_3y >= 0 ? 'text-success' : 'text-danger'}">
-                                        ${data.return_3y >= 0 ? '+' : ''}${data.return_3y.toFixed(2)}%
-                                    </div>
-                                </div>
-                            ` : ''}
-                            ${data.return_5y ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">5 Year Return</div>
-                                    <div class="detail-value ${data.return_5y >= 0 ? 'text-success' : 'text-danger'}">
-                                        ${data.return_5y >= 0 ? '+' : ''}${data.return_5y.toFixed(2)}%
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    ` : ''}
-                    <button class="btn btn-secondary btn-block mt-3" onclick="loadMutualFunds()">
+                    <div class="result-details">
+                        ${retBadge('1 Year Return', r1)}
+                        ${retBadge('3 Year Return', r3)}
+                        ${retBadge('5 Year Return', r5)}
+                    </div>
+                    <button class="btn btn-secondary btn-block" style="margin-top:16px;" onclick="loadMutualFunds();mfLoaded=false;loadMutualFunds();">
                         <i class="fas fa-arrow-left"></i> Back to List
                     </button>
                 </div>
-            </div>
-        `;
-        $('#mfResults').html(html);
+            </div>`);
     }).fail(function() {
-        $('#mfResults').html('<div class="empty-state"><div class="empty-text">Unable to load fund details</div></div>');
-        setTimeout(loadMutualFunds, 2000);
+        $('#mfResults').html(emptyState('Unable to load fund details'));
+        setTimeout(() => { mfLoaded = false; loadMutualFunds(); }, 2000);
     });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// GLOSSARY
-// ═══════════════════════════════════════════════════════════════════════════
-
-const glossaryTerms = [
-    { term: "EMI", definition: "Equated Monthly Installment - Fixed payment amount made by a borrower to a lender at a specified date each month." },
-    { term: "SIP", definition: "Systematic Investment Plan - Investing fixed amounts regularly in mutual funds." },
-    { term: "NAV", definition: "Net Asset Value - Per unit market value of a mutual fund scheme." },
-    { term: "Portfolio", definition: "Collection of financial investments like stocks, bonds, mutual funds, etc." },
-    { term: "Bull Market", definition: "Market condition where prices are rising or expected to rise." },
-    { term: "Bear Market", definition: "Market condition where prices are falling or expected to fall." },
-    { term: "IPO", definition: "Initial Public Offering - When a company offers shares to the public for the first time." },
-    { term: "Dividend", definition: "Portion of company's profits distributed to shareholders." },
-    { term: "Asset Allocation", definition: "Strategy of dividing investments among different asset categories." },
-    { term: "Liquidity", definition: "How quickly an asset can be converted into cash." },
-    { term: "Market Cap", definition: "Total market value of a company's outstanding shares." },
-    { term: "P/E Ratio", definition: "Price-to-Earnings ratio - Valuation metric comparing stock price to earnings per share." },
-    { term: "Diversification", definition: "Strategy of spreading investments across various assets to reduce risk." },
-    { term: "Fixed Deposit", definition: "Investment instrument offering fixed interest rate for a specified tenure." },
-    { term: "Mutual Fund", definition: "Investment vehicle pooling money from multiple investors to invest in securities." },
-    { term: "Index Fund", definition: "Mutual fund designed to track a specific market index." },
-    { term: "Blue Chip", definition: "Stocks of well-established, financially sound companies." },
-    { term: "Volatility", definition: "Degree of variation in trading prices over time." },
-    { term: "ROI", definition: "Return on Investment - Measure of profitability of an investment." },
-    { term: "Inflation", definition: "Rate at which general prices for goods and services rise." }
+// ═══════════════════════════════════════════════════════════════════════
+// GLOSSARY — full list matching the desktop webapp
+// ═══════════════════════════════════════════════════════════════════════
+const GLOSSARY = [
+    { term:"Stock / Share", cat:"Stocks", def:"A small piece of ownership in a company. When you buy a share, you become a part-owner of that company." },
+    { term:"NSE", cat:"Stocks", def:"National Stock Exchange — India's largest stock exchange where stocks like Infosys and TCS are listed and traded." },
+    { term:"BSE", cat:"Stocks", def:"Bombay Stock Exchange — Asia's oldest stock exchange (1875). SENSEX is its benchmark index." },
+    { term:"Nifty 50", cat:"Stocks", def:"An index of the top 50 companies listed on NSE by market capitalisation. Used to measure overall market performance." },
+    { term:"SENSEX", cat:"Stocks", def:"An index of the top 30 companies on BSE. 'SENS' = Sensitive, 'EX' = Index. Tracks how the market moves." },
+    { term:"Bull Market", cat:"Stocks", def:"A period when stock prices are rising and investor confidence is high. 'Bull' because bulls charge upward." },
+    { term:"Bear Market", cat:"Stocks", def:"A period when stock prices fall 20% or more from recent highs. 'Bear' because bears swipe downward." },
+    { term:"Market Cap", cat:"Valuation", def:"Total market value of a company's outstanding shares. = Share Price × Total Shares." },
+    { term:"P/E Ratio", cat:"Valuation", def:"Price-to-Earnings ratio. How much investors pay per rupee of earnings. Lower can mean cheaper stock." },
+    { term:"P/B Ratio", cat:"Valuation", def:"Price-to-Book ratio. Compares stock price to company's book value. Useful for banks and financial firms." },
+    { term:"EPS", cat:"Valuation", def:"Earnings Per Share. Company's net profit divided by total shares. Higher EPS = more profitable." },
+    { term:"Dividend", cat:"Valuation", def:"A portion of a company's profits paid to shareholders, usually quarterly or annually." },
+    { term:"Dividend Yield", cat:"Valuation", def:"Annual dividend / share price. Tells how much income you earn per rupee invested." },
+    { term:"SIP", cat:"Mutual Funds", def:"Systematic Investment Plan. Invest a fixed amount in a mutual fund every month, like a recurring deposit." },
+    { term:"NAV", cat:"Mutual Funds", def:"Net Asset Value. The per-unit price of a mutual fund. Similar to how a stock has a share price." },
+    { term:"AUM", cat:"Mutual Funds", def:"Assets Under Management. Total value of funds managed by an AMC. Larger AUM = bigger fund house." },
+    { term:"ELSS", cat:"Mutual Funds", def:"Equity Linked Savings Scheme. A tax-saving mutual fund with 3-year lock-in. Offers tax benefit under 80C." },
+    { term:"Index Fund", cat:"Mutual Funds", def:"A mutual fund that mimics a market index like Nifty 50 or Sensex. Low cost, passive investing." },
+    { term:"AMC", cat:"Mutual Funds", def:"Asset Management Company. The company that manages your mutual fund money. E.g. HDFC AMC, SBI MF." },
+    { term:"Direct Plan", cat:"Mutual Funds", def:"Buy mutual funds directly from AMC (no middleman). Lower expense ratio = better returns." },
+    { term:"EMI", cat:"Loans", def:"Equated Monthly Installment. Fixed monthly payment you make to repay a loan (principal + interest)." },
+    { term:"Fixed Deposit", cat:"Fixed Income", def:"A bank investment with fixed interest rate for a fixed period. Capital is guaranteed." },
+    { term:"FD", cat:"Fixed Income", def:"Short for Fixed Deposit. Safe investment offering fixed returns over a specified tenure." },
+    { term:"Recurring Deposit", cat:"Fixed Income", def:"Similar to FD but you deposit a fixed amount every month instead of a lump sum." },
+    { term:"Coupon Rate", cat:"Fixed Income", def:"Annual interest rate paid by a bond. E.g. 7% coupon on a ₹1,000 bond = ₹70/year." },
+    { term:"Inflation", cat:"General", def:"Rate at which prices of goods/services rise over time, reducing purchasing power of money." },
+    { term:"Portfolio", cat:"General", def:"Collection of all your financial investments — stocks, FDs, mutual funds, gold, etc." },
+    { term:"Diversification", cat:"General", def:"Spreading investments across different assets to reduce risk. 'Don't put all eggs in one basket.'" },
+    { term:"Liquidity", cat:"General", def:"How quickly an asset can be converted to cash. Savings accounts are highly liquid; real estate is not." },
+    { term:"Risk", cat:"General", def:"The chance that an investment returns less than expected. Higher risk = potentially higher reward." },
+    { term:"Returns", cat:"General", def:"The profit/gain you earn on an investment, expressed as a percentage of the invested amount." },
+    { term:"CAGR", cat:"General", def:"Compound Annual Growth Rate. The steady rate at which an investment would have grown each year." },
+    { term:"ROI", cat:"General", def:"Return on Investment. (Gain − Cost) / Cost × 100. Measures how profitable an investment is." },
+    { term:"Demat Account", cat:"General", def:"Dematerialised account that holds your stocks and mutual fund units in electronic form." },
+    { term:"Broker", cat:"General", def:"An intermediary (person or app) through which you buy/sell stocks. E.g. Zerodha, Groww, Angel One." },
+    { term:"SEBI", cat:"Tax & Regulation", def:"Securities and Exchange Board of India. Regulates the stock market to protect investors." },
+    { term:"RBI", cat:"Tax & Regulation", def:"Reserve Bank of India. India's central bank — controls monetary policy and interest rates." },
+    { term:"Section 80C", cat:"Tax & Regulation", def:"Income tax deduction up to ₹1.5 lakh for investments in ELSS, PPF, LIC, EPF, NSC, etc." },
+    { term:"LTCG", cat:"Tax & Regulation", def:"Long-Term Capital Gains. Profit from selling assets held over 1 year. Taxed at 10% above ₹1 lakh (equity)." },
+    { term:"STCG", cat:"Tax & Regulation", def:"Short-Term Capital Gains. Profit from selling equity held less than 1 year. Taxed at 15%." },
+    { term:"FII / FPI", cat:"Tax & Regulation", def:"Foreign Institutional Investor / Foreign Portfolio Investor. Large overseas entities investing in Indian markets." },
+    { term:"DII", cat:"Tax & Regulation", def:"Domestic Institutional Investors. Indian entities like mutual funds, insurance companies, banks." },
+    { term:"IPO", cat:"Stocks", def:"Initial Public Offering. When a company sells its shares to the public for the very first time." },
+    { term:"Bonus Issue", cat:"Stocks", def:"Free extra shares given to existing shareholders. E.g. 1:1 bonus means 1 free share per 1 held." },
+    { term:"Stock Split", cat:"Stocks", def:"Dividing each share into multiple shares. Reduces price per share, makes it more affordable." },
+    { term:"Volatility", cat:"General", def:"How much a stock's price fluctuates. High volatility = bigger swings, more risk and opportunity." },
+    { term:"Blue Chip", cat:"Stocks", def:"Shares of large, well-established, financially sound companies with a long track record." },
+    { term:"Penny Stock", cat:"Stocks", def:"Very low-priced stocks, usually of small companies. High risk, highly speculative." },
+    { term:"Circuit Breaker", cat:"Stocks", def:"Automatic halt in trading when a stock moves beyond a set limit (e.g. 5%, 10%, 20%) in a day." },
+    { term:"Zakat", cat:"General", def:"Islamic obligatory charity — 2.5% of net wealth above the Nisab threshold, paid annually." },
+    { term:"Nisab", cat:"General", def:"Minimum wealth threshold for Zakat eligibility. Currently equivalent to the value of 85g of gold." },
 ];
 
 function loadGlossary() {
-    displayGlossary(glossaryTerms);
+    displayGlossary(GLOSSARY);
 }
 
 function displayGlossary(terms) {
     let html = '';
-    terms.forEach(item => {
+    terms.forEach(t => {
         html += `
             <div class="glossary-item">
-                <div class="glossary-term">${item.term}</div>
-                <div class="glossary-definition">${item.definition}</div>
-            </div>
-        `;
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <div class="glossary-term">${t.term}</div>
+                    <span style="font-size:11px;padding:2px 8px;background:var(--accent-light);color:var(--accent);border-radius:20px;font-weight:600;">${t.cat}</span>
+                </div>
+                <div class="glossary-definition">${t.def}</div>
+            </div>`;
     });
-    $('#glossaryResults').html(html);
+    $('#glossaryResults').html(html || emptyState('No terms found'));
 }
 
 function searchGlossary() {
-    const query = $('#glossarySearch').val().toLowerCase();
-    if (!query) {
-        displayGlossary(glossaryTerms);
-        return;
-    }
-    
-    const filtered = glossaryTerms.filter(item => 
-        item.term.toLowerCase().includes(query) || 
-        item.definition.toLowerCase().includes(query)
-    );
-    displayGlossary(filtered);
+    const q = $('#glossarySearch').val().toLowerCase();
+    if (!q) { displayGlossary(GLOSSARY); return; }
+    displayGlossary(GLOSSARY.filter(t =>
+        t.term.toLowerCase().includes(q) || t.def.toLowerCase().includes(q) || t.cat.toLowerCase().includes(q)
+    ));
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// NEWS, CURRENCY, METALS
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ═══════════════════════════════════════════════════════════════════════
+// NEWS — uses /news endpoint (returns array with .title/.source/.link/.published)
+// ═══════════════════════════════════════════════════════════════════════
 function loadNews() {
     $('#newsResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
-    
     $.getJSON('/news', function(data) {
+        if (!data || !data.length) { $('#newsResults').html(emptyState('No news available')); return; }
         let html = '';
-        data.slice(0, 20).forEach(article => {
+        data.slice(0, 30).forEach(article => {
+            const link    = article.link || article.url || '#';
+            const source  = article.source || '';
+            const pubStr  = article.published || article.publishedAt || '';
+
+            // Try to parse the RFC-2822 date that the backend sends
+            let timeDisplay = '';
+            if (pubStr) {
+                const d = new Date(pubStr);
+                if (!isNaN(d.getTime())) {
+                    const diff = Math.round((Date.now() - d.getTime()) / 60000);
+                    if (diff < 60)        timeDisplay = `${diff}m ago`;
+                    else if (diff < 1440) timeDisplay = `${Math.round(diff/60)}h ago`;
+                    else                  timeDisplay = `${Math.round(diff/1440)}d ago`;
+                }
+            }
+
+            const sourceColor = article.color || 'var(--accent)';
             html += `
-                <div class="news-card" onclick="window.open('${article.url}', '_blank')">
-                    <div class="news-title">${article.title}</div>
-                    <div class="news-meta">
-                        <span class="news-source">${article.source}</span>
-                        <span class="news-time">
-                            <i class="fas fa-clock"></i>
-                            ${new Date(article.publishedAt).toLocaleString()}
-                        </span>
+                <div class="news-card" onclick="window.open('${link}', '_blank')">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                        <span style="font-size:11px;font-weight:700;color:white;background:${sourceColor};padding:2px 8px;border-radius:20px;">${source}</span>
+                        ${timeDisplay ? `<span style="font-size:12px;color:var(--muted);"><i class="fas fa-clock"></i> ${timeDisplay}</span>` : ''}
                     </div>
-                </div>
-            `;
+                    <div class="news-title">${article.title}</div>
+                    <div style="font-size:12px;color:var(--accent);margin-top:6px;font-weight:600;">Read more →</div>
+                </div>`;
         });
         $('#newsResults').html(html);
     }).fail(function() {
-        $('#newsResults').html('<div class="empty-state"><div class="empty-text">Unable to load news</div></div>');
+        $('#newsResults').html(emptyState('Unable to load news'));
     });
 }
 
-function loadCurrency() {
-    convertCurrency();
-}
+// ═══════════════════════════════════════════════════════════════════════
+// CURRENCY — uses /currency_convert for conversion + /currency for rates table
+// ═══════════════════════════════════════════════════════════════════════
+let _currencyDebounce = null;
 
 function convertCurrency() {
+    clearTimeout(_currencyDebounce);
+    _currencyDebounce = setTimeout(_doConvert, 400);
+}
+
+function _doConvert() {
     const amount = parseFloat($('#currencyAmount').val()) || 1;
-    const from = $('#currencyFrom').val();
-    const to = $('#currencyTo').val();
-    
+    const from   = $('#currencyFrom').val();
+    const to     = $('#currencyTo').val();
+
     $('#currencyResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
-    
-    $.getJSON(`/currency?from=${from}&to=${to}&amount=${amount}`, function(data) {
-        const html = `
+
+    $.getJSON(`/currency_convert?from=${from}&to=${to}&amount=${amount}`, function(data) {
+        if (data.error) { $('#currencyResults').html(emptyState('Conversion error: ' + data.error)); return; }
+        $('#currencyResults').html(`
             <div class="result-card">
                 <div class="result-main">
                     <div class="result-label">${amount} ${from} =</div>
-                    <div class="result-value">${data.converted.toFixed(2)} ${to}</div>
+                    <div class="result-value">${Number(data.converted).toFixed(4)} ${to}</div>
                     <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-2);">
-                        Rate: 1 ${from} = ${data.rate.toFixed(4)} ${to}
+                        Rate: 1 ${from} = ${Number(data.rate).toFixed(4)} ${to}
+                        <br><span style="color:var(--muted);font-size:11px;">Source: ECB via Frankfurter · ${data.date}</span>
                     </div>
                 </div>
-            </div>
-        `;
-        $('#currencyResults').html(html);
+            </div>`);
     }).fail(function() {
-        $('#currencyResults').html('<div class="empty-state"><div class="empty-text">Unable to fetch exchange rates</div></div>');
+        $('#currencyResults').html(emptyState('Unable to fetch exchange rates'));
     });
 }
 
+function loadCurrencyRates() {
+    $('#currencyRatesTable').html('<div class="loading-spinner"><div class="spinner"></div></div>');
+    $.getJSON('/currency', function(data) {
+        if (data.error) { $('#currencyRatesTable').html(''); return; }
+        let rows = '';
+        (data.rates || []).forEach(r => {
+            rows += `<tr>
+                <td>${r.flag} <strong>${r.code}</strong></td>
+                <td>${r.name}</td>
+                <td style="text-align:right;font-weight:700;color:var(--accent);">₹${Number(r.inr_per_unit).toFixed(2)}</td>
+                <td style="text-align:right;color:var(--muted);font-size:13px;">${Number(r.unit_per_inr).toFixed(6)}</td>
+            </tr>`;
+        });
+        $('#currencyRatesTable').html(`
+            <div class="widget-card">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="fas fa-table"></i> All Rates vs ₹ INR</h5>
+                </div>
+                <div class="widget-body" style="padding:0;overflow-x:auto;">
+                    <table class="table" style="margin:0;">
+                        <thead><tr><th>Code</th><th>Currency</th><th style="text-align:right;">1 Unit → ₹</th><th style="text-align:right;">₹1 →</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                <div style="padding:8px 16px;font-size:11px;color:var(--muted);">Source: ${data.source} · ${data.date}</div>
+            </div>`);
+    }).fail(function() { $('#currencyRatesTable').html(''); });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// METALS — uses /metals endpoint
+// ═══════════════════════════════════════════════════════════════════════
 function loadMetals() {
     $('#metalsResults').html('<div class="loading-spinner"><div class="spinner"></div></div>');
-    
-    $.getJSON('/metals', function(data) {
+    $.getJSON('/metals', function(d) {
+        if (d.error) { $('#metalsResults').html(emptyState(d.error)); return; }
+
+        const metalCard = (name, icon, color, price, unit, intlUSD, intlUnit, change, changePct, prevPrice) => {
+            const up  = change >= 0;
+            const cls = up ? 'positive' : 'negative';
+            const ico = up ? '▲' : '▼';
+            return `
+                <div class="widget-card" style="margin-bottom:12px;">
+                    <div class="widget-body">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:44px;height:44px;background:${color};border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;">${icon}</div>
+                            <div>
+                                <div style="font-size:18px;font-weight:700;">${name}</div>
+                                <div style="font-size:12px;color:var(--muted);">${unit}</div>
+                            </div>
+                            <div style="margin-left:auto;text-align:right;">
+                                <div style="font-size:12px;color:var(--muted);">International</div>
+                                <div style="font-size:13px;font-weight:600;color:var(--text-2);">$${Number(intlUSD).toFixed(2)}/${intlUnit}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:30px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;">₹${fmtINR(price)}</div>
+                        <div style="margin-top:8px;display:flex;align-items:center;gap:12px;">
+                            <span class="market-change ${cls}">${ico} ₹${fmtINR(Math.abs(change))} (${Math.abs(changePct).toFixed(2)}%)</span>
+                        </div>
+                        <div style="margin-top:8px;font-size:12px;color:var(--muted);">Prev Close: ₹${fmtINR(prevPrice)}</div>
+                    </div>
+                </div>`;
+        };
+
         let html = '';
-        if (data.gold) {
-            html += `
-                <div class="market-card">
-                    <div class="market-header">
-                        <div class="market-name"><i class="fas fa-gem" style="color: var(--gold);"></i> Gold</div>
-                    </div>
-                    <div class="market-value">₹${data.gold.price_inr.toLocaleString('en-IN')}</div>
-                    <div style="font-size:12px;color:var(--muted);margin-top:4px;">per 10g · MCX Futures</div>
-                </div>
-            `;
-        }
-        if (data.silver) {
-            html += `
-                <div class="market-card">
-                    <div class="market-header">
-                        <div class="market-name"><i class="fas fa-gem" style="color: #94a3b8;"></i> Silver</div>
-                    </div>
-                    <div class="market-value">₹${data.silver.price_inr.toLocaleString('en-IN')}</div>
-                    <div style="font-size:12px;color:var(--muted);margin-top:4px;">per 1kg · MCX Futures</div>
-                </div>
-            `;
+        if (d.gold)   html += metalCard('Gold',   '🥇', 'rgba(217,119,6,0.15)',  d.gold.price_inr,   'per 10g · MCX Futures', d.gold.price_usd_oz,   'oz', d.gold.change,   d.gold.change_pct,   d.gold.prev_inr);
+        if (d.silver) html += metalCard('Silver', '🥈', 'rgba(148,163,184,0.2)', d.silver.price_inr, 'per kg · MCX Futures',  d.silver.price_usd_oz, 'oz', d.silver.change, d.silver.change_pct, d.silver.prev_inr);
+
+        if (d.usd_inr) {
+            html += `<div style="font-size:12px;color:var(--muted);text-align:center;padding:4px;">USD/INR Rate Used: ₹${d.usd_inr} · Source: ${d.source}</div>`;
         }
         $('#metalsResults').html(html);
     }).fail(function() {
-        $('#metalsResults').html('<div class="empty-state"><div class="empty-text">Unable to load metal prices</div></div>');
+        $('#metalsResults').html(emptyState('Unable to load metal prices'));
     });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CHAT FUNCTIONALITY
-// ═══════════════════════════════════════════════════════════════════════════
-
-function handleChatKeypress(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendChatMessage();
-    }
+// ═══════════════════════════════════════════════════════════════════════
+// CHAT  — posts to /chat (alias of /get on the backend)
+// ═══════════════════════════════════════════════════════════════════════
+function handleChatKeypress(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
 }
 
 function sendChatMessage() {
-    const input = $('#chatInput');
+    const input   = $('#chatInput');
     const message = input.val().trim();
-    
     if (!message) return;
-    
-    // Add user message
+
     addChatMessage(message, 'user');
-    input.val('');
-    
-    // Show loading
-    const loadingId = 'loading-' + Date.now();
-    addChatMessage('<div class="loading-spinner"><div class="spinner"></div></div>', 'bot', loadingId);
-    
-    // Send to backend
+    input.val('').css('height', 'auto');
+
+    const loadId = 'loading_' + Date.now();
+    $('#messagesContainer').append(`<div id="${loadId}" class="message bot">
+        <div class="message-avatar"><i class="fas fa-robot"></i></div>
+        <div class="message-content"><div class="loading-spinner" style="padding:4px;"><div class="spinner" style="width:24px;height:24px;border-width:2px;"></div></div></div>
+    </div>`);
+    scrollChat();
+
     $.post('/chat', { msg: message }, function(response) {
-        $(`#${loadingId}`).parent().parent().remove();
+        $(`#${loadId}`).remove();
         addChatMessage(response, 'bot');
     }).fail(function() {
-        $(`#${loadingId}`).parent().parent().remove();
+        $(`#${loadId}`).remove();
         addChatMessage('Sorry, I encountered an error. Please try again.', 'bot');
     });
 }
 
-function addChatMessage(content, type, id = null) {
+function addChatMessage(content, type) {
     const avatar = type === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-    const messageId = id || '';
-    
-    const html = `
-        <div class="message ${type}" ${messageId ? `id="${messageId}"` : ''}>
+    $('#messagesContainer').append(`
+        <div class="message ${type}">
             <div class="message-avatar">${avatar}</div>
             <div class="message-content">${content}</div>
-        </div>
-    `;
-    
-    $('#messagesContainer').append(html);
-    $('#messagesContainer').scrollTop($('#messagesContainer')[0].scrollHeight);
+        </div>`);
+    scrollChat();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// INITIALIZATION
-// ═══════════════════════════════════════════════════════════════════════════
+function scrollChat() {
+    const c = document.getElementById('messagesContainer');
+    if (c) c.scrollTop = c.scrollHeight;
+}
 
-$(document).ready(function() {
-    // Load initial data
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+$(document).ready(function () {
     loadMarketIndices();
     loadTopGainers();
     loadTopLosers();
-    
+
     // Auto-resize chat textarea
-    $('#chatInput').on('input', function() {
+    $('#chatInput').on('input', function () {
         this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
-    
-    // Close menu on navigation
-    $('.nav-item').click(function() {
-        closeMenu();
-    });
-    
-    // Refresh market data every 5 minutes
-    setInterval(function() {
+
+    // Refresh home data every 5 minutes
+    setInterval(function () {
         if (currentSection === 'home') {
             loadMarketIndices();
             loadTopGainers();
@@ -1239,7 +1417,6 @@ $(document).ready(function() {
         }
     }, 300000);
 });
-
 </script>
 </body>
 </html>

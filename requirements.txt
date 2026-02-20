@@ -1,0 +1,10 @@
+Flask
+pandas
+openpyxl
+yfinance
+requests
+SpeechRecognition
+pyttsx3
+beautifulsoup4
+lxml
+gunicorn

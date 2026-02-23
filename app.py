@@ -27,6 +27,10 @@ def _supa() -> Client:
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "fallback-dev-key")
 
+@app.route('/health')
+def health():
+    return 'ok', 200
+
 # ─── Portfolio API Routes ──────────────────────────────────────────────────────
 @app.route('/api/portfolio/identify', methods=['POST'])
 def portfolio_identify():
